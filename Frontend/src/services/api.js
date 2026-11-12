@@ -50,7 +50,11 @@ export async function apiRequest(path, { method = 'GET', body = null, isFormData
 
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const message = payload?.error?.message || payload?.message || `HTTP ${response.status}`;
+    let message = payload?.error?.message || payload?.message || `HTTP ${response.status}`;
+    if (response.status === 405 && !payload?.error?.message) {
+      message =
+        'HTTP 405 (Method Not Allowed): Frontend is calling a static path instead of the Express API. Set VITE_API_BASE_URL to your deployed Backend URL ending in /api and redeploy.';
+    }
     const err = new Error(message);
     err.status = response.status;
     err.payload = payload;
