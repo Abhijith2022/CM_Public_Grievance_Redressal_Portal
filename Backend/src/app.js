@@ -27,13 +27,26 @@ app.use(
 
 const allowedOrigins = (process.env.CORS_ORIGIN || '*')
   .split(',')
-  .map((o) => o.trim())
+  .map((o) => o.trim().replace(/\/+$/, ''))
   .filter(Boolean);
+
+function isOriginAllowed(origin) {
+  if (!origin || allowedOrigins.includes('*')) return true;
+  const cleanOrigin = origin.replace(/\/+$/, '');
+  return allowedOrigins.some((pattern) => {
+    if (pattern === cleanOrigin) return true;
+    if (pattern.includes('*')) {
+      const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^.]+');
+      return new RegExp(`^${escaped}$`, 'i').test(cleanOrigin);
+    }
+    return false;
+  });
+}
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+      if (isOriginAllowed(origin)) {
         return callback(null, true);
       }
       return callback(new AppError(`CORS origin "${origin}" is not allowed.`, 403, 'CORS_NOT_ALLOWED'));
