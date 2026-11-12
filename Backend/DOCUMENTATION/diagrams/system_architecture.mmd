@@ -1,0 +1,10 @@
+flowchart LR
+  User["Citizen / CMO Admin / Dept Officer (React Client)"] -->|"HTTPS /api/*"| VercelEdge["Vercel Edge Network & Rewrites"]
+  VercelEdge -->|"/ & /api"| ApiIndex["Express Serverless Index (api/index.js)"]
+  VercelEdge -->|"/api/* Serverless"| ExpressAPI["Express 4 Serverless API (api/[...all].js)"]
+  ApiIndex --> Controllers
+  ExpressAPI -->|"JWT + RBAC Middleware"| Controllers["Route Controllers & Validation"]
+  Controllers -->|"Cached Mongoose Pool (mongodb+srv://)"| MongoAtlas[("MongoDB Atlas Cloud")]
+  Controllers -->|"Binary Buffers (<=3MB)"| MongoAtlas
+  Controllers -->|"HTTPS JSON Prompt"| GeminiAPI["Google Gemini API (gemini-2.5-flash)"]
+  GeminiAPI -.->|"If key missing / unavailable"| FallbackNLP["Labelled Deterministic Fallback Engine"]

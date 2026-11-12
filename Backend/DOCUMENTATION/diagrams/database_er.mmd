@@ -1,0 +1,102 @@
+erDiagram
+  USER ||--o{ GRIEVANCE : submits
+  USER ||--o{ GRIEVANCE : assigned_as_officer
+  USER ||--o{ GRIEVANCE_HISTORY : changes
+  USER ||--o{ ATTACHMENT : uploads
+  USER ||--o{ CITIZEN_FEEDBACK : gives
+  DEPARTMENT ||--o{ USER : employs_officers
+  DEPARTMENT ||--o{ GRIEVANCE : assigned_to
+  DEPARTMENT ||--o{ DEPARTMENT_ASSIGNMENT : receives
+  GRIEVANCE ||--|{ GRIEVANCE_HISTORY : tracks
+  GRIEVANCE ||--o{ DEPARTMENT_ASSIGNMENT : routed_via
+  GRIEVANCE ||--o{ ATTACHMENT : has_files
+  GRIEVANCE ||--o| CITIZEN_FEEDBACK : receives_feedback
+
+  USER {
+    ObjectId _id PK
+    string name
+    string email UK
+    string mobileNumber
+    string passwordHash
+    string role
+    ObjectId department FK
+    string district
+    boolean isActive
+  }
+  DEPARTMENT {
+    ObjectId _id PK
+    string name UK
+    string code UK
+    string shortDescription
+    array categories
+    number slaDays
+    boolean isFeatured
+  }
+  GRIEVANCE {
+    ObjectId _id PK
+    string referenceId UK
+    ObjectId citizen FK
+    string district
+    string category
+    string subject
+    string description
+    string originalDescription
+    string status
+    string priority
+    ObjectId assignedDepartment FK
+    ObjectId assignedOfficer FK
+    boolean isEscalated
+    date dueDate
+    object aiAnalysis
+    object actionTakenReport
+  }
+  GRIEVANCE_HISTORY {
+    ObjectId _id PK
+    ObjectId grievance FK
+    string referenceId
+    string action
+    string fromStatus
+    string toStatus
+    string remark
+    boolean isInternal
+    ObjectId changedBy FK
+    string changedByRole
+    date createdAt
+  }
+  DEPARTMENT_ASSIGNMENT {
+    ObjectId _id PK
+    ObjectId grievance FK
+    ObjectId department FK
+    ObjectId assignedOfficer FK
+    ObjectId assignedBy FK
+    string priority
+    date dueDate
+    string status
+  }
+  ATTACHMENT {
+    ObjectId _id PK
+    string originalName
+    string mimeType
+    number size
+    buffer data
+    ObjectId uploadedBy FK
+    ObjectId grievance FK
+    string purpose
+  }
+  CITIZEN_FEEDBACK {
+    ObjectId _id PK
+    ObjectId grievance FK
+    ObjectId citizen FK
+    number rating
+    boolean isSatisfied
+    string comment
+    boolean reopenRequested
+  }
+  CONTACT_ENQUIRY {
+    ObjectId _id PK
+    string name
+    string email
+    string subject
+    string message
+    string status
+  }
